@@ -1,0 +1,78 @@
+---
+title: "Monitor de Operaciones Pro"
+format:
+  dashboard:
+        # Probamos un tema de Bootstrap para mejorar la estética global
+    theme: cosmo
+        # Opcional: sidebar para alertas o filtros futuros
+    sidebar:
+      - title: Alertas Críticas (0)
+---
+
+# Vista General
+
+## Row {height=30%}
+
+::: {.valuebox icon="cpu" color="primary"}
+45%
+Uso de CPU
+:::
+
+::: {.valuebox icon="memory" color="info"}
+2.4 GB / 8 GB
+Memoria RAM
+:::
+
+::: {.valuebox icon="clock-history" color="success"}
+15 días
+Uptime del Sistema
+:::
+
+### Contenedores Activos
+
+**Salud General de Servicios:**
+
+::: {.d-flex .align-items-center .mb-2}
+<i class="bi bi-check-circle-fill text-success fs-4 me-2"></i> Nginx Reverse Proxy (Saludable)
+:::
+::: {.d-flex .align-items-center .mb-2}
+<i class="bi bi-check-circle-fill text-success fs-4 me-2"></i> Node.js Core API (Saludable)
+:::
+::: {.d-flex .align-items-center .mb-2}
+<i class="bi bi-check-circle-fill text-success fs-4 me-2"></i> Redis Cache Cluster (Saludable)
+:::
+
+## Row {height=70%}
+
+### Column {width=65%}
+
+```{python}
+#| title: Tráfico del Sistema (Últimas 24 Horas)
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import datetime
+
+# Generar datos simulados para el gráfico
+np.random.seed(42)
+now = datetime.datetime.now()
+dates = pd.date_range(start=now - datetime.timedelta(hours=24), end=now, freq='15min')
+data = pd.DataFrame({
+    'Tiempo': dates,
+    'Peticiones/min': np.concatenate([
+        np.random.normal(100, 20, size=int(len(dates)*0.8)),
+        np.random.normal(500, 50, size=int(len(dates)*0.2)) # Pico de tráfico
+    ])
+}).sort_values('Tiempo')
+
+# Crear gráfico interactivo lineal con Plotly
+fig = px.line(data, x='Tiempo', y='Peticiones/min',
+              title='Análisis de Carga de Tráfico')
+
+# Resaltar picos de tráfico en rojo
+peaks = data[data['Peticiones/min'] > 300]
+fig.add_scatter(x=peaks['Tiempo'], y=peaks['Peticiones/min'],
+                mode='markers', marker=dict(color='red', size=10), name='Picos Detectados')
+
+fig.update_layout(xaxis_title="Hora", yaxis_title="Requerimientos por Minuto", template="plotly_white")
+fig.show()
