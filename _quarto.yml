@@ -1,5 +1,4 @@
 project:
   title: "mi-primer-dashboard"
-
-
-
+  type: website
+  output-dir: docs

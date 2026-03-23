@@ -2,11 +2,11 @@
 title: "Monitor de Operaciones Pro"
 format:
   dashboard:
-        # Probamos un tema de Bootstrap para mejorar la estética global
     theme: cosmo
-        # Opcional: sidebar para alertas o filtros futuros
-    sidebar:
-      - title: Alertas Críticas (0)
+    orientation: rows
+execute:
+  echo: false
+jupyter: python3
 ---
 
 # Vista General
@@ -14,32 +14,21 @@ format:
 ## Row {height=30%}
 
 ::: {.valuebox icon="cpu" color="primary"}
-45%
 Uso de CPU
+
+45%
 :::
 
 ::: {.valuebox icon="memory" color="info"}
-2.4 GB / 8 GB
 Memoria RAM
+
+2.4 GB / 8 GB
 :::
 
 ::: {.valuebox icon="clock-history" color="success"}
-15 días
 Uptime del Sistema
-:::
 
-### Contenedores Activos
-
-**Salud General de Servicios:**
-
-::: {.d-flex .align-items-center .mb-2}
-<i class="bi bi-check-circle-fill text-success fs-4 me-2"></i> Nginx Reverse Proxy (Saludable)
-:::
-::: {.d-flex .align-items-center .mb-2}
-<i class="bi bi-check-circle-fill text-success fs-4 me-2"></i> Node.js Core API (Saludable)
-:::
-::: {.d-flex .align-items-center .mb-2}
-<i class="bi bi-check-circle-fill text-success fs-4 me-2"></i> Redis Cache Cluster (Saludable)
+15 días
 :::
 
 ## Row {height=70%}
@@ -57,11 +46,15 @@ import datetime
 np.random.seed(42)
 now = datetime.datetime.now()
 dates = pd.date_range(start=now - datetime.timedelta(hours=24), end=now, freq='15min')
+n = len(dates)
+n_normal = int(n * 0.8)
+n_peak = n - n_normal
+
 data = pd.DataFrame({
     'Tiempo': dates,
     'Peticiones/min': np.concatenate([
-        np.random.normal(100, 20, size=int(len(dates)*0.8)),
-        np.random.normal(500, 50, size=int(len(dates)*0.2)) # Pico de tráfico
+        np.random.normal(100, 20, size=n_normal),
+        np.random.normal(500, 50, size=n_peak)
     ])
 }).sort_values('Tiempo')
 
@@ -76,3 +69,37 @@ fig.add_scatter(x=peaks['Tiempo'], y=peaks['Peticiones/min'],
 
 fig.update_layout(xaxis_title="Hora", yaxis_title="Requerimientos por Minuto", template="plotly_white")
 fig.show()
+```
+
+### Column {width=35%}
+
+#### Contenedores Activos
+
+**Salud General de Servicios:**
+
+| Servicio | Estado |
+|---|---|
+| Nginx Reverse Proxy | Saludable |
+| Node.js Core API | Saludable |
+| Redis Cache Cluster | Saludable |
+
+# Base de Datos
+
+## Row {height=100%}
+
+### Column {width=100%}
+
+```{python}
+#| title: "Estado de la Base de Datos"
+import plotly.express as px
+import pandas as pd
+
+# Datos de ejemplo
+df = pd.DataFrame({
+    "Tabla": ["Usuarios", "Transacciones", "Logs", "Sesiones"],
+    "Registros (Millones)": [1.2, 5.4, 12.8, 3.1]
+})
+
+fig2 = px.bar(df, x="Tabla", y="Registros (Millones)", color="Tabla", title="Volumen de Datos")
+fig2.show()
+```

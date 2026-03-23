@@ -1,0 +1,143 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Monitor de Operaciones Pro\"\n",
+        "format:\n",
+        "  dashboard:\n",
+        "        # Probamos un tema de Bootstrap para mejorar la estética global\n",
+        "    theme: cosmo\n",
+        "        # Opcional: sidebar para alertas o filtros futuros\n",
+        "    sidebar:\n",
+        "      - title: Alertas Críticas (0)\n",
+        "execute:\n",
+        "  echo: false\n",
+        "jupyter: python3\n",
+        "---\n",
+        "\n",
+        "# Vista General\n",
+        "\n",
+        "## Row {height=30%}\n",
+        "\n",
+        "::: {.valuebox icon=\"cpu\" color=\"primary\"}\n",
+        "45%\n",
+        "Uso de CPU\n",
+        ":::\n",
+        "\n",
+        "::: {.valuebox icon=\"memory\" color=\"info\"}\n",
+        "2.4 GB / 8 GB\n",
+        "Memoria RAM\n",
+        ":::\n",
+        "\n",
+        "::: {.valuebox icon=\"clock-history\" color=\"success\"}\n",
+        "15 días\n",
+        "Uptime del Sistema\n",
+        ":::\n",
+        "\n",
+        "### Contenedores Activos\n",
+        "\n",
+        "**Salud General de Servicios:**\n",
+        "\n",
+        "::: {.d-flex .align-items-center .mb-2}\n",
+        "<i class=\"bi bi-check-circle-fill text-success fs-4 me-2\"></i> Nginx Reverse Proxy (Saludable)\n",
+        ":::\n",
+        "::: {.d-flex .align-items-center .mb-2}\n",
+        "<i class=\"bi bi-check-circle-fill text-success fs-4 me-2\"></i> Node.js Core API (Saludable)\n",
+        ":::\n",
+        "::: {.d-flex .align-items-center .mb-2}\n",
+        "<i class=\"bi bi-check-circle-fill text-success fs-4 me-2\"></i> Redis Cache Cluster (Saludable)\n",
+        ":::\n",
+        "\n",
+        "## Row {height=70%}\n",
+        "\n",
+        "### Column {width=65%}"
+      ],
+      "id": "9ccecf00"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "title": "Tráfico del Sistema (Últimas 24 Horas)"
+      },
+      "source": [
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "import plotly.express as px\n",
+        "import datetime\n",
+        "\n",
+        "# Generar datos simulados para el gráfico\n",
+        "np.random.seed(42)\n",
+        "now = datetime.datetime.now()\n",
+        "dates = pd.date_range(start=now - datetime.timedelta(hours=24), end=now, freq='15min')\n",
+        "data = pd.DataFrame({\n",
+        "    'Tiempo': dates,\n",
+        "    'Peticiones/min': np.concatenate([\n",
+        "        np.random.normal(100, 20, size=int(len(dates)*0.8)),\n",
+        "        np.random.normal(500, 50, size=int(len(dates)*0.2)) # Pico de tráfico\n",
+        "    ])\n",
+        "}).sort_values('Tiempo')\n",
+        "\n",
+        "# Crear gráfico interactivo lineal con Plotly\n",
+        "fig = px.line(data, x='Tiempo', y='Peticiones/min',\n",
+        "              title='Análisis de Carga de Tráfico')\n",
+        "\n",
+        "# Resaltar picos de tráfico en rojo\n",
+        "peaks = data[data['Peticiones/min'] > 300]\n",
+        "fig.add_scatter(x=peaks['Tiempo'], y=peaks['Peticiones/min'],\n",
+        "                mode='markers', marker=dict(color='red', size=10), name='Picos Detectados')\n",
+        "\n",
+        "fig.update_layout(xaxis_title=\"Hora\", yaxis_title=\"Requerimientos por Minuto\", template=\"plotly_white\")\n",
+        "fig.show()"
+      ],
+      "id": "15905f43",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Base de Datos\n",
+        "\n",
+        "## Row {height=100%}\n",
+        "\n",
+        "### Column {width=100%}"
+      ],
+      "id": "a618c00d"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "title": "Estado de la Base de Datos"
+      },
+      "source": [
+        "import plotly.express as px\n",
+        "import pandas as pd\n",
+        "\n",
+        "# Datos de ejemplo\n",
+        "df = pd.DataFrame({\n",
+        "    \"Tabla\": [\"Usuarios\", \"Transacciones\", \"Logs\", \"Sesiones\"],\n",
+        "    \"Registros (Millones)\": [1.2, 5.4, 12.8, 3.1]\n",
+        "})\n",
+        "\n",
+        "fig2 = px.bar(df, x=\"Tabla\", y=\"Registros (Millones)\", color=\"Tabla\", title=\"Volumen de Datos\")\n",
+        "fig2.show()"
+      ],
+      "id": "b77ca513",
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
