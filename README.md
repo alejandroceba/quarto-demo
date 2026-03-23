@@ -1,6 +1,6 @@
 # Mi Primer Dashboard
 
-Este repositorio contiene un dashboard construido con [Quarto](https://quarto.org/) y Python, configurado para desplegarse automáticamente en GitHub Pages usando GitHub Actions.
+Este repositorio contiene un dashboard construido con [Quarto](https://quarto.org/) y Python, configurado para desplegarse en GitHub Pages desde la carpeta `docs/`.
 
 ## Prerrequisitos
 - Quarto (para desarrollo local)
@@ -9,9 +9,9 @@ Este repositorio contiene un dashboard construido con [Quarto](https://quarto.or
 
 ---
 
-## 🚀 Cómo iniciar tu repositorio y hacer el Deploy
+## Cómo iniciar tu repositorio y hacer el Deploy
 
-Sigue estos pasos detallados para subir tu código a GitHub y que se publique automáticamente tu Dashboard.
+Sigue estos pasos detallados para subir tu código a GitHub y que se publique tu Dashboard.
 
 ### 1. Iniciar el repositorio localmente
 
@@ -25,7 +25,7 @@ git init
 git add .
 
 # 3. Crear el primer commit con un mensaje descriptivo
-git commit -m "feat: configuración inicial, dashboard y deploy de github actions"
+git commit -m "feat: configuración inicial del dashboard"
 
 # 4. Asegurarse de que la rama principal se llama 'main'
 git branch -M main
@@ -46,28 +46,86 @@ git remote add origin https://github.com/TU-USUARIO/mi-primer-dashboard.git
 git push -u origin main
 ```
 
-### 3. Configurar GitHub Pages (El Deploy Automático)
-
-Una vez que subas (hagas `push`) de tu código, **GitHub Actions** (gracias al archivo que creamos en `.github/workflows/deploy.yml`) comenzará a instalar Python, descargar tus librerías y renderizar tu Dashboard automáticamente. 
-
-Para que tu sitio web sea visible en internet, configura **GitHub Pages**:
+### 3. Configurar GitHub Pages
 
 1. Ve a la pestaña **Settings** (Configuración) de tu repositorio en GitHub.
 2. En el menú lateral izquierdo, haz clic en **Pages**.
 3. En la sección **Build and deployment**, asegúrate de que **Source** esté configurado como **Deploy from a branch**.
-4. En **Branch**, selecciona la rama llamada `gh-pages` (si no aparece al instante, espera un par de minutos a que termine la acción en la pestaña "Actions", recarga la página y aparecerá) y luego el folder `/ (root)`. Haz clic en **Save**.
-5. ¡Listo! En la parte superior de esa misma sección de Pages, aparecerá el enlace a tu dashboard publicado (por ejemplo: `https://TU-USUARIO.github.io/mi-primer-dashboard/`).
+4. En **Branch**, selecciona la rama `main` y la carpeta `/docs`. Haz clic en **Save**.
+5. En unos minutos aparecerá el enlace a tu dashboard publicado (por ejemplo: `https://TU-USUARIO.github.io/mi-primer-dashboard/`).
 
 ---
 
-## Desarrollo Local (Opcional)
+## Desarrollo Local
 
-Si quieres agregar gráficos o ver el dashboard localmente en tu computadora mientras haces cambios antes de subirlos a GitHub:
+Para hacer cambios y previsualizarlos antes de subirlos a GitHub:
 
 ```bash
-# Instalar las librerías necesarias de Python
+# Activar el entorno virtual
+source .venv/bin/activate
+
+# Instalar las librerías necesarias de Python (si no lo has hecho)
 pip install -r requirements.txt
 
-# Renderizar y previsualizar tu dashboard con Quarto
+# Previsualizar el dashboard en el navegador
 quarto preview mi-primer-dashboard.qmd
+
+# Cuando estés listo para publicar, renderiza el dashboard
+quarto render mi-primer-dashboard.qmd
+
+# Haz commit y push (incluyendo la carpeta docs/)
+git add .
+git commit -m "update: actualizar dashboard"
+git push
 ```
+
+---
+
+## Alternativa: Deploy automático con GitHub Actions
+
+Si prefieres que el dashboard se renderice automáticamente en cada push (sin necesidad de correr `quarto render` localmente), puedes usar un workflow de GitHub Actions.
+
+Crea el archivo `.github/workflows/deploy.yml` con el siguiente contenido:
+
+```yaml
+on:
+  push:
+    branches: main
+  workflow_dispatch:
+
+name: Quarto Publish
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Render and Publish
+        uses: quarto-dev/quarto-actions/publish@v2
+        with:
+          target: gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+> **Nota:** Si usas este método, configura GitHub Pages con la rama `gh-pages` y carpeta `/ (root)` en lugar de `main` y `/docs`.
