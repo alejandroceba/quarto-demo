@@ -1,7 +1,7 @@
 /.quarto/
 **/*.quarto_ipynb
-mi-primer-dashboard.html
-mi-primer-dashboard_files/
+/mi-primer-dashboard.html
+/mi-primer-dashboard_files/
 
 .claude/
 .venv/
