@@ -2,7 +2,7 @@
 
 Este repositorio contiene un dashboard construido con [Quarto](https://quarto.org/) y Python, configurado para desplegarse en GitHub Pages desde la carpeta `docs/`.
 
-## Prerrequisitos
+## Prerrequisitos :rocket:
 - Quarto (para desarrollo local)
 - Python 3.10+
 - Dependencias definidas en `requirements.txt` (`pandas`, `numpy`, `plotly`, `jupyter`)
