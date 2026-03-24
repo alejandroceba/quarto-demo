@@ -1,5 +1,5 @@
 ---
-title: "Monitor de Operaciones Pro"
+title: "Monitor de Operaciones Pro en vivo"
 format:
   dashboard:
     theme: cosmo
